@@ -35,9 +35,9 @@ db.once('open', function(){
 
 //mongoose.connect('mongodb://ipadderss/userinfo'); external ip connect
 mongoose.connect('mongodb://localhost/userinfo');
-var Userinfo = require('./model/User');
-var route = require('./router/router.js')(router,Userinfo);
-
+//var Userinfo = require('./model/User');
+var route = require('./router/router')//(router,Userinfo);
+router.use('/',route);
 
 var server = router.listen(port, function(){
 	console.log("Express server has started on port 8080")

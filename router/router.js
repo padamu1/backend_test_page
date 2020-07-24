@@ -1,5 +1,7 @@
 const express = require("express");
-module.exports = function(router,Userinfo){
+var router = express.Router();
+var Userinfo = require("../model/User");
+
     router.get('/user',function(req,res){
         var sess = req.session;
 	if(sess.userid){
@@ -86,4 +88,4 @@ module.exports = function(router,Userinfo){
         }
     });
    	
-}
+module.exports = router;
