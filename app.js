@@ -1,21 +1,22 @@
 var express = require('express');
-var app = express();
+var router = express();
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var fs = require("fs");
 var mongoose = require('mongoose');
 
-app.set('views', __dirname + '/views'); // views where?
-app.set('view engine', 'ejs'); //views working format
-app.engine('html', require('ejs').renderFile); //ejs -> HTML
+router.set('views', __dirname + '/views'); // views where?
+router.set('view engine', 'ejs'); //views working format
+router.engine('html', require('ejs').renderFile); //ejs -> HTML
 
 
 
 
 //app.use(express.static('public')); //design form
 
-app.use(bodyParser.json());
+router.use(bodyParser.json());
 //app.use(bodyParser.urlencoded());
-app.use(session({
+router.use(session({
 	secret: '@#@$MYSIGN#@$#$',
 	resave: false,
 	saveUninitialized: true
@@ -34,8 +35,11 @@ db.once('open', function(){
 
 //mongoose.connect('mongodb://ipadderss/userinfo'); external ip connect
 mongoose.connect('mongodb://localhost/userinfo');
+var Userinfo = require('./model/User');
+var route = require('./router/router.js')(router,Userinfo);
 
 
-var server = app.listen(port, function(){
+var server = router.listen(port, function(){
 	console.log("Express server has started on port 8080")
 }); //server create
+
