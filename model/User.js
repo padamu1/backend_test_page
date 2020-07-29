@@ -47,5 +47,34 @@ userSchema.methods.comparePassword = function(in_password,cb){
     });
 }
 
+//use token -- not used 
+
+userSchema.methods.generateToken = function (cb) {
+  var user = this;
+  console.log("user", user);
+  console.log("userSchema", userSchema);
+  var token = jwt.sign(user._id.toHexString(), "secret");
+  var oneHour = moment().add(1, "hour").valueOf();
+
+  user.tokenExp = oneHour;
+  user.token = token;
+  user.save(function (err, user) {
+    if (err) return cb(err);
+    cb(null, user);
+  });
+};
+
+userSchema.statics.findByToken = function (token, cb) {
+  var user = this;
+
+  jwt.verify(token, "secret", function (err, decode) {
+    user.findOne({ _id: decode, token: token }, function (err, user) {
+      if (err) return cb(err);
+      cb(null, user);
+    });
+  });
+};
+
+
 const User = mongoose.model("userinfo",userSchema);
 module.exports = User;
