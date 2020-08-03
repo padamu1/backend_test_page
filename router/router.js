@@ -1,6 +1,7 @@
 const express = require("express");
 var router = express.Router();
 var Userinfo = require("../model/User");
+const User = require("../model/User");
 
     router.get('/user',function(req,res){
 	if(req.token != ""){
@@ -48,16 +49,18 @@ var Userinfo = require("../model/User");
 
     router.post('/logout',function(req,res){
    	if(req.token!=""){
-            req.session.destroy(function(err){
-                if(err){
-        	    throw Error
-        	}else{
-        	    return res.json({"success":"logout success"})
-        	}
-            })
-    	}else{
-            return res.json({"success":"logout failed"})
-    	}
+        User.findeOneAndUpdate(
+			{userid:req.userid},
+			{token:"",tokenExp:""},
+			(err,doc)=>{
+					if(err) return res.json({"success":"fail",err});
+					return res.status(200).send({
+						"success":"logout success"
+					});
+			});
+		}else{
+			return res.json({"success":"fail"})
+		}
     });
 	
     router.post('/register',function(req,res){
