@@ -1,23 +1,31 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const moment = require("moment");
 const saltRounds = 10;
 const userSchema = mongoose.Schema({
-    "userid": {
+    userid: {
       type: String,
       maxlength: 50,
     },
-    "useremail": {
+    useremail: {
       type: String,
       trim: true,
       unique: 1,
     },
-    "password": {
+    password: {
       type: String,
       minglength: 5,
     },
-    "username": {
+    username: {
       type: String,
       maxlength: 50,
+    },
+    token:{
+      type: String,
+    },
+    tokenExp:{
+      type: Number,
     },
 });
 

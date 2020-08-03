@@ -3,12 +3,11 @@ var router = express.Router();
 var Userinfo = require("../model/User");
 
     router.get('/user',function(req,res){
-        var sess = req.session;
-	if(sess.userid){
+	if(req.token != ""){
             res.status(200).json({
-                userid : sess.userid,
-        	useremail : sess.useremail,
-        	username : sess.username,
+                userid : req.userid,
+        		useremail : req.useremail,
+        		username : req.username,
             });
         }else{
             res.json({"success":"not login"})
@@ -16,7 +15,6 @@ var Userinfo = require("../model/User");
     });
     router.post("/login",function(req,res) {
         if((req.body.userid != null)&&(req.body.password != null)){
-       	    sess = req.session;
        	    Userinfo.findOne({"userid":req.body.userid},function(err,user){
       	        if(err){
        	            throw new Error("Error")
@@ -29,10 +27,14 @@ var Userinfo = require("../model/User");
         	            throw new Error("Error")
         	        }
         	        if(result == true){
-        	            sess.username = req.body.username;
-        	            sess.userid = req.body.userid;
-        	            sess.useremail = req.body.useremail;
-        	            return res.json({"success":"user login"});
+						user.generateToken((err,user)=>{
+							res.cookie("w_authExp",user.tokenExp);
+							res.cookie("w_auth",user.token).status(200).json({
+								"success" : "user login",
+								userid = req.body.userid,
+								useremail = req.body.useremail,
+							})
+						});
         	        }else{
         	            return res.json({"success":"dose not match"});
         	        }
@@ -45,8 +47,7 @@ var Userinfo = require("../model/User");
     });
 
     router.post('/logout',function(req,res){
-    	sess = req.session;
-   	if(sess.userid){
+   	if(req.token!=""){
             req.session.destroy(function(err){
                 if(err){
         	    throw Error
@@ -70,11 +71,11 @@ var Userinfo = require("../model/User");
 	                return res.json({"success":"user already exist"})
 	            }else{
 	                var user = new Userinfo();
-			user.userid=req.body.userid;
-			user.username=req.body.username;
-			user.password=req.body.password;
-			user.useremail=req.body.useremail;
-	                user.save((err,doc) => {
+					user.userid=req.body.userid;
+					user.username=req.body.username;
+					user.password=req.body.password;
+					user.useremail=req.body.useremail;
+	        		user.save((err,doc) => {
 	                    if(err) {throw new Error("Error")}
 	                    return res.status(200).json({"success":"submit"})
 	                })
